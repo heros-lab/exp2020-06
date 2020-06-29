@@ -25,7 +25,6 @@ class CorrelationAnalyzer:
         for i in range(len(self.df_x)):
             self.df_list.append(self.df_x[i][x_label].join(self.df_y[i][y_label]))
             self.df_corr.append(self.df_list[-1].corr()[x_label][len(x_label):])
-
         strong_corrs = sum(self.df_corr[i].apply(lambda x: np.abs(x) >= 0.7).values for i in range(len(self.df_corr)))
         self.prop_index = {label: np.where(strong_corrs[y_label.index(label)] > 0)[0] for label in y_label}
 

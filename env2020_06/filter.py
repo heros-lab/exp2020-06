@@ -28,8 +28,8 @@ class Filter_with_IQR(FilterClass):
         lim_upper = q3 + iqr * 1.5
         lim_lower = q1 - iqr * 1.5
         return pd_series[pd_series.apply(lambda x: lim_lower < x < lim_upper)]
-
-
+    
+    
 class Filter_with_2sigma(FilterClass):
     def __init__(self):
         self.filter_type = "2-sigma Filter"
@@ -37,9 +37,9 @@ class Filter_with_2sigma(FilterClass):
     def type(self):
         print(f"This Filter is {self.filter_type}")
 
-    def filtering(data_list):
+    def filtering(self, data_list):
         data = pd.Series(data_list)
         mean, std = data.describe().loc[["mean", "std"]]
         lim_upper = mean + std * 2.0
         lim_lower = mean - std * 2.0
-        return pd_series[pd_series.apply(lambda x: lim_lower < x < lim_upper)]
+        return data[data.apply(lambda x: lim_lower < x < lim_upper)]
