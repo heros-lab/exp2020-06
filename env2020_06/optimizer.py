@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 import numpy as np
 import pandas as pd
-import filter
 import optuna
 from optuna.integration import KerasPruningCallback
 from tensorflow.keras.backend import clear_session
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.optimizers import Adam
+from . import filter
 
 
-class NetworkOptimizerClass:
-    def __init__(self, epochs, sample, max_units, batch_size, dataset, score_file_path, result_file_path, model_type, num_all_elements=None):
+class NetworkOptimizer:
+    def __init__(self, model_type, epochs, sample, max_units, batch_size, dataset, score_file_path, result_file_path, num_all_elements=None):
         self.num_elements = num_all_elements
         self.epochs = epochs
         self.sample = sample

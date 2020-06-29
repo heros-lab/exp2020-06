@@ -1,57 +1,37 @@
 import numpy as np
 import pandas as pd
-import re
+
 
 class DatasetManager:
-    def __init__(self, dataset_directory, dataset_config):
-        self.data_dir = dataset_directory
-        self.data_conf = pd.read_csv(f"{self.data_dir}/dataset_config.csv", index_col=0)
-        self.index_conf = pd.read_csv(dataset_config, index_col=0).replace(-1, np.nan)
-
-    def select_index(self, model_type):
-        if "conv." in model_type:
-            model_id = re.compile("\d+").findall(model_type)[0]
-            common_type = self.index_conf.columns.str.endswith(model_id)
-            x_index = None
-            y_index = self.index_conf.loc["y_index", common_type].values.astype("int32")
+    def __init__(self, dataset_directory):
+        self.dir_path = dataset_directory
+        
+    def load(self, learn_name, test_name, x_index, y_index):
+        if type(learn_name) == list:
+            # create learing-data
+            learn_x = pd.read_csv(f"{self.dir_path}/{learn_name[0]}_x.csv", index_col=0).values[:, x_index]
+            learn_y = pd.read_csv(f"{self.dir_path}/{learn_name[0]}_y.csv", index_col=0).values[:, y_index]
+            for label in learn_name[1:]:
+                learn_x = np.vstack((learn_x, pd.read_csv(f"{self.dir_path}/{label}_x.csv", index_col=0).values[:, x_index]))
+                learn_y = np.vstack((learn_y, pd.read_csv(f"{self.dir_path}/{label}_y.csv", index_col=0).values[:, y_index]))
+            # create test-data
+            test_x = pd.read_csv(f"{self.dir_path}/{test_name[0]}_x.csv", index_col=0).values[:, x_index]
+            test_y = pd.read_csv(f"{self.dir_path}/{test_name[0]}_y.csv", index_col=0).values[:, y_index]
+            for label in test_name[1:]:
+                test_x = np.vstack((test_x, pd.read_csv(f"{self.dir_path}/{label}_x.csv", index_col=0).values[:, x_index]))
+                test_y = np.vstack((test_y, pd.read_csv(f"{self.dir_path}/{label}_y.csv", index_col=0).values[:, y_index]))
         else:
-            x_index = self.index_conf[model_type].loc[["x_index"]].dropna().values.astype("int32")
-            y_index = self.index_conf[model_type].loc[["y_index"]].dropna().values.astype("int32")
-        return x_index, y_index
-
-    def load_dataset(self, model_type, data_type):
-        model_id = re.compile("\d+").findall(model_type)[0]  # extract model-ID from model-type
-        data_name = self.data_conf[f"model{model_id}"].loc[data_type]
-        data_x = pd.read_csv(f"{self.data_dir}/{data_name}_x.csv", index_col=0).values
-        data_y = pd.read_csv(f"{self.data_dir}/{data_name}_y.csv", index_col=0).values
-        print(f"Model-type: {model_type}, Load-data >> {data_name}")
-        return data_x, data_y
-
-    def learn_data(self, model_type):
-        x_index, y_index = self.select_index(model_type)
-        learn_x, learn_y = self.load_dataset(model_type, "learn-data")
-        if x_index is not None:
-            learn_x = learn_x[:, x_index]
-            learn_y = learn_y[:, y_index]
-        else:
-            learn_x = learn_x
-            learn_y = learn_y[:, y_index]
-        print(f"Index: x >> {x_index}, y >> {y_index}")
-        return learn_x, learn_y
-
-    def test_data(self, model_type):
-        x_index, y_index = self.select_index(model_type)
-        test_x, test_y = self.load_dataset(model_type, "test-data")
-        if x_index is not None:
-            test_x = test_x[:, x_index]
-            test_y = test_y[:, y_index]
-        else:
-            test_x = test_x
-            test_y = test_y[:, y_index]
-        print(f"Index: x >> {x_index}, y >> {y_index}")
-        return test_x, test_y
-
-if __name__ == '__main__':
-    dataset_dir = "dataset"
-    dataset_config = "conf/dataset_config.csv"
-    dm = DatasetManager(f{data, "index_config.csv\")
+            learn_x = pd.read_csv(f"{self.dir_path}/{learn_name}_x.csv", index_col=0).values[:, x_index]
+            learn_y = pd.read_csv(f"{self.dir_path}/{learn_name}_y.csv", index_col=0).values[:, y_index]
+            test_x = pd.read_csv(f"{self.dir_path}/{test_name}_x.csv", index_col=0).values[:, x_index]
+            test_y = pd.read_csv(f"{self.dir_path}/{test_name}_y.csv", index_col=0).values[:, y_index]
+            
+        dataset = {
+            "learn-x": learn_x,
+            "learn-y": learn_y,
+            "test-x": test_x,
+            "test-y": test_y
+        }
+        
+        return dataset
+    
