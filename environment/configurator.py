@@ -42,17 +42,22 @@ class OptimizeConfigurator:
     def detect_model_type(self, model_name):
         return "Model-" + model_name[-1]
         
-    def get_learn_data(self, model_name):
+    def get_dataset(self, model_name):
         model_type = self.detect_model_type(model_name)
-        return self.optimize_conf[model_type].loc["Learning-data"]
-        
-    def get_test_data(self, model_name):
-        model_type = self.detect_model_type(model_name)
-        return self.optimize_conf[model_type].loc["Test-data"]
+        learn_data = self.optimize_conf[model_type].loc["Learning-data"]
+        test_data = self.optimize_conf[model_type].loc["Test-data"]
+        return learn_data, test_data
         
     def get_unit_range(self, model_name):
         model_type = self.detect_model_type(model_name)
         return self.optimize_conf[model_type].loc[["Range-unit1", "Range-unit2"]].astype("int").values
+    
+    def get_elements(self, model_name):
+        model_type = self.detect_model_type(model_name)
+        return self.optimize_conf[model_type].loc[["Elements"]].astype("int").values[0]
+    
+    def get_config(self, model_name):
+        return self.model_conf.get_config(model_name)
     
     # Wrapper method of ModelConfigurator
     def get_index(self, model_name):

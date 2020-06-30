@@ -38,8 +38,8 @@ class Filter_with_2sigma(FilterClass):
         print(f"This Filter is {self.filter_type}")
 
     def filtering(self, data_list):
-        data = pd.Series(data_list)
-        mean, std = data.describe().loc[["mean", "std"]]
+        pd_series = pd.Series(data_list)
+        mean, std = pd_series.describe().loc[["mean", "std"]]
         lim_upper = mean + std * 2.0
         lim_lower = mean - std * 2.0
-        return data[data.apply(lambda x: lim_lower < x < lim_upper)]
+        return pd_series[pd_series.apply(lambda x: lim_lower < x < lim_upper)]
